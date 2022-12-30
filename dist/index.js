@@ -1,26 +1,35 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const colors_1 = __importDefault(require("colors"));
-const cors_1 = __importDefault(require("cors"));
-const dotenv_1 = __importDefault(require("dotenv"));
-const express_1 = __importDefault(require("express"));
-const db_1 = require("./config/db");
-const app = (0, express_1.default)();
-// Enable CORS
-app.use((0, cors_1.default)());
+import colors from 'colors';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express from 'express';
+import morgan from 'morgan';
+import connectDB from './config/db.js';
+import authRouter from './routes/auth.js';
 // Load env vars
-dotenv_1.default.config({ path: "./config/.env" });
+dotenv.config({ path: "./config/.env" });
+const app = express();
+// Body parser
+app.use(express.json());
+// Enable CORS
+app.use(cors());
+// Dev logging middleware
+if (process.env.NODE_ENV === "development") {
+    app.use(morgan("dev"));
+}
 // Connect to MongoDB
-(0, db_1.connectDB)();
+connectDB();
+// Mount routes
+app.use("/api/v1/auth", authRouter);
+app.get("/api/v1/auth/l", (req, res) => {
+    res.status(200).json(true);
+});
 const port = process.env.PORT;
 let server = app.listen(port, () => {
-    console.log(colors_1.default.yellow(`⚡️[server]: Server is running at http://localhost:${port}`));
+    console.log(colors.yellow(`⚡️[server]: Server is running at http://localhost:${port}`));
 });
 process.on("unhandledRejection", (err, promise) => {
-    console.log(colors_1.default.red(err.message));
+    console.log(colors.red(err.message));
     // close server and exit
-    server.close(() => process.exit(1));
+    // server.close(() => process.exit(1));
 });
+//# sourceMappingURL=index.js.map

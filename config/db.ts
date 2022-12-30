@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 // Connecting to mongoDB
-export const connectDB = async (): Promise<void> => {
+const connectDB = async (): Promise<void> => {
   mongoose.set("strictQuery", true);
   const URI = process.env.MONGO_URI;
   if (typeof URI === "string") {
@@ -9,3 +9,5 @@ export const connectDB = async (): Promise<void> => {
     console.log(`MongoDB Connected: ${conn.connection.host}`.bgGreen.white);
   }
 };
+
+export default connectDB;
