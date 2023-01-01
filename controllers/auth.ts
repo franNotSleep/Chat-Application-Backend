@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
 
 import asyncHandler from '../middleware/asyncHandler.js';
+import { CustomRequest } from '../middleware/auth.js';
 import { User, UserMethods, UserModel } from '../model/User.js';
 import ErrorResponse from '../utils/errorResponse.js';
 
@@ -15,6 +16,12 @@ interface UserRegistration {
 type UserType = User & {
   _id: Types.ObjectId;
 } & UserMethods;
+
+interface NewCustomRequest extends CustomRequest {
+  user: {
+    id: string;
+  };
+}
 
 /**
  * @desc Sign up User
@@ -79,13 +86,69 @@ export const logout = asyncHandler(
 );
 
 /**
- * @desc Log user out & clear cookie
- * @route GET /api/v1/auth/logout
+ * @desc Get current logged in user
+ * @route GET /api/v1/auth/me
  * @access Private
  */
 export const me = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    res.status(200).json({ hola: "hola" });
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    res.status(200).json({ success: true, data: req.user });
+  }
+);
+
+/**
+ * @desc  Update user details
+ * @route PUT /api/v1/auth/uptdetails
+ * @access Private
+ */
+export const updateDetails = asyncHandler(
+  async (req: NewCustomRequest, res: Response, next: NextFunction) => {
+    const fields: Partial<{ name: string; email: string }> = {
+      name: req.body.name,
+      email: req.body.email,
+    };
+
+    const user = await UserModel.findByIdAndUpdate(req.user.id, fields, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({ success: true, data: user });
+  }
+);
+
+/**
+ * @desc  Update user password
+ * @route PUT /api/v1/auth/uptpassword
+ * @access Private
+ */
+export const updatePassword = asyncHandler(
+  async (req: NewCustomRequest, res: Response, next: NextFunction) => {
+    interface UpdatePassword {
+      currentPassword: string;
+      newPassword: string;
+    }
+    const reqBody: UpdatePassword = {
+      currentPassword: req.body.currentPassword,
+      newPassword: req.body.newPassword,
+    };
+
+    const user = await UserModel.findById(req.user.id).select("+password");
+
+    // Check current password
+    const isMatch: boolean | undefined = await user?.matchPassword(
+      reqBody.currentPassword
+    );
+    if (!isMatch) {
+      return next(new ErrorResponse("Password is incorrect.", 401));
+    }
+
+    // if user is not null
+    if (user) {
+      user.password = reqBody.newPassword;
+      await user.save();
+      createAndSendToken(user, res, 200);
+    }
   }
 );
 

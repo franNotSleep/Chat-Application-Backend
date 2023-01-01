@@ -14,13 +14,7 @@ import asyncHandler from './asyncHandler.js';
 // Protect routes
 export const protect = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let token = "";
-    if (req.headers.authorization &&
-        req.headers.authorization.startsWith("Bearer")) {
-        // ['Bearer', token]
-        //    0        1
-        token = req.headers.authorization.split(" ")[1];
-    }
-    else if (req.cookies.token) {
+    if (req.cookies.token) {
         token = req.cookies.token;
     }
     // Check token
@@ -30,9 +24,8 @@ export const protect = asyncHandler((req, res, next) => __awaiter(void 0, void 0
     // Verify token
     try {
         if (typeof process.env.JWT_SECRET === "string") {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            const objectId = decoded.id;
-            const user = UserModel.findById(decoded.id);
+            const { id } = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = yield UserModel.findById(id);
             next();
         }
     }

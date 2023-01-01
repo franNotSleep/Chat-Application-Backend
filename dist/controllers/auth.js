@@ -57,12 +57,51 @@ export const logout = asyncHandler((req, res, next) => __awaiter(void 0, void 0,
     res.status(200).json({ success: true });
 }));
 /**
- * @desc Log user out & clear cookie
- * @route GET /api/v1/auth/logout
+ * @desc Get current logged in user
+ * @route GET /api/v1/auth/me
  * @access Private
  */
 export const me = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    res.status(200).json({ hola: "hola" });
+    res.status(200).json({ success: true, data: req.user });
+}));
+/**
+ * @desc  Update user details
+ * @route PUT /api/v1/auth/uptdetails
+ * @access Private
+ */
+export const updateDetails = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const fields = {
+        name: req.body.name,
+        email: req.body.email,
+    };
+    const user = yield UserModel.findByIdAndUpdate(req.user.id, fields, {
+        new: true,
+        runValidators: true,
+    });
+    res.status(200).json({ success: true, data: user });
+}));
+/**
+ * @desc  Update user password
+ * @route PUT /api/v1/auth/uptpassword
+ * @access Private
+ */
+export const updatePassword = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const reqBody = {
+        currentPassword: req.body.currentPassword,
+        newPassword: req.body.newPassword,
+    };
+    const user = yield UserModel.findById(req.user.id).select("+password");
+    // Check current password
+    const isMatch = yield (user === null || user === void 0 ? void 0 : user.matchPassword(reqBody.currentPassword));
+    if (!isMatch) {
+        return next(new ErrorResponse("Password is incorrect.", 401));
+    }
+    // if user is not null
+    if (user) {
+        user.password = reqBody.newPassword;
+        yield user.save();
+        createAndSendToken(user, res, 200);
+    }
 }));
 /**
  * Create token

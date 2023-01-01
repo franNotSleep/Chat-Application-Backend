@@ -5,8 +5,12 @@ import { UserModel } from '../model/User.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import asyncHandler from './asyncHandler.js';
 
-interface CustomRequest extends Request {
+export interface CustomRequest extends Request {
   user: object | null;
+}
+
+interface JwtPayload {
+  id: string;
 }
 
 // Protect routes
@@ -14,14 +18,7 @@ export const protect = asyncHandler(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     let token: string = "";
 
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      // ['Bearer', token]
-      //    0        1
-      token = req.headers.authorization.split(" ")[1];
-    } else if (req.cookies.token) {
+    if (req.cookies.token) {
       token = req.cookies.token;
     }
 
@@ -33,9 +30,8 @@ export const protect = asyncHandler(
     // Verify token
     try {
       if (typeof process.env.JWT_SECRET === "string") {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const objectId = decoded.id;
-        const user = UserModel.findById(decoded.id);
+        const { id } = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
+        req.user = await UserModel.findById(id);
         next();
       }
     } catch (error) {

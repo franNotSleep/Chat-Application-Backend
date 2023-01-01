@@ -45,7 +45,7 @@ UserSchema.pre("save", function (next) {
 });
 UserSchema.methods.getSignJwToken = function () {
     if (typeof process.env.JWT_SECRET === "string") {
-        return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+        return jwt.sign({ id: this._id.toString() }, process.env.JWT_SECRET, {
             expiresIn: process.env.JWT_EXPIRE,
         });
     }
