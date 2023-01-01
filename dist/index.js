@@ -1,15 +1,19 @@
 import colors from 'colors';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import morgan from 'morgan';
 import connectDB from './config/db.js';
+import errorHandler from './middleware/errorHandler.js';
 import authRouter from './routes/auth.js';
 // Load env vars
 dotenv.config({ path: "./config/.env" });
 const app = express();
 // Body parser
 app.use(express.json());
+// Cookie Parser
+app.use(cookieParser());
 // Enable CORS
 app.use(cors());
 // Dev logging middleware
@@ -20,9 +24,8 @@ if (process.env.NODE_ENV === "development") {
 connectDB();
 // Mount routes
 app.use("/api/v1/auth", authRouter);
-app.get("/api/v1/auth/l", (req, res) => {
-    res.status(200).json(true);
-});
+//  Handle errors
+app.use(errorHandler);
 const port = process.env.PORT;
 let server = app.listen(port, () => {
     console.log(colors.yellow(`⚡️[server]: Server is running at http://localhost:${port}`));
