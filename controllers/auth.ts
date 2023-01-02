@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 
 import asyncHandler from '../middleware/asyncHandler.js';
 import { CustomRequest } from '../middleware/auth.js';
-import { User, UserMethods, UserModel } from '../model/User.js';
+import { User, UserMethods, userModel } from '../model/User.js';
 import ErrorResponse from '../utils/errorResponse.js';
 
 interface UserRegistration {
@@ -17,9 +17,10 @@ type UserType = User & {
   _id: Types.ObjectId;
 } & UserMethods;
 
-interface NewCustomRequest extends CustomRequest {
+export interface NewCustomRequest extends CustomRequest {
   user: {
     id: string;
+    _id?: Types.ObjectId;
   };
 }
 
@@ -32,7 +33,7 @@ export const register = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const reqBody: UserRegistration = req.body;
     // Creating User
-    const newUser = await UserModel.create(reqBody);
+    const newUser = await userModel.create(reqBody);
     createAndSendToken(newUser, res, 200);
   }
 );
@@ -53,9 +54,9 @@ export const login = asyncHandler(
     }
 
     // Check if user exist and password is correct
-    const user = await UserModel.findOne({ email: reqBody.email }).select(
-      "+password"
-    );
+    const user = await userModel
+      .findOne({ email: reqBody.email })
+      .select("+password");
     if (!user) {
       return next(new ErrorResponse("Invalid Credentials", 401));
     }
@@ -108,7 +109,7 @@ export const updateDetails = asyncHandler(
       email: req.body.email,
     };
 
-    const user = await UserModel.findByIdAndUpdate(req.user.id, fields, {
+    const user = await userModel.findByIdAndUpdate(req.user.id, fields, {
       new: true,
       runValidators: true,
     });
@@ -133,7 +134,7 @@ export const updatePassword = asyncHandler(
       newPassword: req.body.newPassword,
     };
 
-    const user = await UserModel.findById(req.user.id).select("+password");
+    const user = await userModel.findById(req.user.id).select("+password");
 
     // Check current password
     const isMatch: boolean | undefined = await user?.matchPassword(

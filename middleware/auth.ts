@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import { UserModel } from '../model/User.js';
+import { userModel } from '../model/User.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import asyncHandler from './asyncHandler.js';
 
@@ -31,7 +31,7 @@ export const protect = asyncHandler(
     try {
       if (typeof process.env.JWT_SECRET === "string") {
         const { id } = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
-        req.user = await UserModel.findById(id);
+        req.user = await userModel.findById(id);
         next();
       }
     } catch (error) {

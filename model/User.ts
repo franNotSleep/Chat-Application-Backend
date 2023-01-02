@@ -14,9 +14,9 @@ export interface UserMethods {
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
-type UserModel = mongoose.Model<User, {}, UserMethods>;
+export type UserModel = mongoose.Model<User, {}, UserMethods>;
 
-const UserSchema = new mongoose.Schema<User, UserModel, UserMethods>({
+const userSchema = new mongoose.Schema<User, UserModel, UserMethods>({
   name: {
     type: String,
     required: [true, "Please add a name"],
@@ -40,7 +40,7 @@ const UserSchema = new mongoose.Schema<User, UserModel, UserMethods>({
 });
 
 // Encrypt Password
-UserSchema.pre("save", async function (next) {
+userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
   }
@@ -49,7 +49,7 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-UserSchema.methods.getSignJwToken = function (): string {
+userSchema.methods.getSignJwToken = function (): string {
   if (typeof process.env.JWT_SECRET === "string") {
     return jwt.sign({ id: this._id.toString() }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRE,
@@ -58,12 +58,12 @@ UserSchema.methods.getSignJwToken = function (): string {
   return "";
 };
 
-UserSchema.methods.matchPassword = async function matchPassword(
+userSchema.methods.matchPassword = async function matchPassword(
   enteredPassword: string
 ): Promise<boolean> {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const UserModel = mongoose.model<User, UserModel>("User", UserSchema);
+const userModel = mongoose.model<User, UserModel>("User", userSchema);
 
-export { UserModel };
+export { userModel };

@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, "Please add a name"],
@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema({
     },
 });
 // Encrypt Password
-UserSchema.pre("save", function (next) {
+userSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!this.isModified("password")) {
             next();
@@ -43,7 +43,7 @@ UserSchema.pre("save", function (next) {
         next();
     });
 });
-UserSchema.methods.getSignJwToken = function () {
+userSchema.methods.getSignJwToken = function () {
     if (typeof process.env.JWT_SECRET === "string") {
         return jwt.sign({ id: this._id.toString() }, process.env.JWT_SECRET, {
             expiresIn: process.env.JWT_EXPIRE,
@@ -51,11 +51,11 @@ UserSchema.methods.getSignJwToken = function () {
     }
     return "";
 };
-UserSchema.methods.matchPassword = function matchPassword(enteredPassword) {
+userSchema.methods.matchPassword = function matchPassword(enteredPassword) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield bcrypt.compare(enteredPassword, this.password);
     });
 };
-const UserModel = mongoose.model("User", UserSchema);
-export { UserModel };
+const userModel = mongoose.model("User", userSchema);
+export { userModel };
 //# sourceMappingURL=User.js.map

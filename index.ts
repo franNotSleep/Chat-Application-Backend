@@ -10,8 +10,8 @@ import morgan from 'morgan';
 import connectDB from './config/db.js';
 import errorHandler from './middleware/errorHandler.js';
 import authRouter from './routes/auth.js';
-
-const xss = require("xss-clean");
+import messageRoute from './routes/message.js';
+import userRoute from './routes/users.js';
 
 // Load env vars
 dotenv.config({ path: "./config/.env" });
@@ -33,9 +33,6 @@ app.use(ExpressMongoSanitize());
 // Set security header
 app.use(helmet());
 
-// Security for XSS
-app.use(xss());
-
 // Prevent http param pollution
 
 // Dev logging middleware
@@ -48,6 +45,8 @@ connectDB();
 
 // Mount routes
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/user", userRoute);
+app.use("/api/v1/message", messageRoute);
 
 //  Handle errors
 app.use(errorHandler);

@@ -4,4 +4,4 @@ import { protect } from '../middleware/auth.js';
 const userRoute = express.Router();
 userRoute.get("/", protect, getUsers);
 export default userRoute;
-//# sourceMappingURL=users.js.map
+//# sourceMappingURL=chat.js.map

@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import jwt from 'jsonwebtoken';
-import { UserModel } from '../model/User.js';
+import { userModel } from '../model/User.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import asyncHandler from './asyncHandler.js';
 // Protect routes
@@ -25,7 +25,7 @@ export const protect = asyncHandler((req, res, next) => __awaiter(void 0, void 0
     try {
         if (typeof process.env.JWT_SECRET === "string") {
             const { id } = jwt.verify(token, process.env.JWT_SECRET);
-            req.user = yield UserModel.findById(id);
+            req.user = yield userModel.findById(id);
             next();
         }
     }
