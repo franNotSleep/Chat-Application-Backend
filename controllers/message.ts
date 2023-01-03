@@ -1,18 +1,29 @@
 import { NextFunction, Response } from 'express';
 
 import asyncHandler from '../middleware/asyncHandler.js';
+import Group from '../model/Group.js';
 import Message from '../model/Message.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import { NewCustomRequest } from './auth.js';
 
 /**
  * @desc Create Message
- * @route POST /api/v1/message
+ * @route POST /api/v1/:groupId/message
  * @access Private
  */
 export const createMessage = asyncHandler(
   async (req: NewCustomRequest, res: Response, next: NextFunction) => {
+    const group = await Group.findById(req.params.group_id);
+    if (!group) {
+      return next(
+        new ErrorResponse(
+          `Group with id: ${req.params.group_id} was not found.`,
+          404
+        )
+      );
+    }
     const message = await Message.create({
+      group: req.params.group_id,
       sender: req.user.id,
       content: req.body.content,
     });
@@ -23,12 +34,26 @@ export const createMessage = asyncHandler(
 
 /**
  * @desc Get all messages
- * @route GET /api/v1/message
+ * @route GET /api/v1/:groupId/message
  * @access Public
  */
 export const getMessages = asyncHandler(
   async (req: NewCustomRequest, res: Response, next: NextFunction) => {
-    const message = await Message.find().populate("sender");
+    const group = await Group.findById(req.params.group_id);
+    if (!group) {
+      return next(
+        new ErrorResponse(
+          `Group with id: ${req.params.group_id} was not found.`,
+          404
+        )
+      );
+    }
+    const message = await Message.find({ group: req.params.group_id }).populate(
+      {
+        path: "group",
+        select: "name _id",
+      }
+    );
     res.status(201).json(message);
   }
 );

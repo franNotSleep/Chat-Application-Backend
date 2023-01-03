@@ -11,7 +11,7 @@ import asyncHandler from '../middleware/asyncHandler.js';
 import { userModel } from '../model/User.js';
 /**
  * @desc Get Users
- * @route Get /api/v1/user/search?
+ * @route Get /api/v1/user?search=
  * @access Public
  */
 export const getUsers = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

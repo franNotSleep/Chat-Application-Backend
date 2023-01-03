@@ -1,10 +1,10 @@
 import mongoose, { Schema, Types } from 'mongoose';
 
 export interface IMessage {
+  _id: Types.ObjectId;
   sender: Types.ObjectId;
   content: string;
-  chat: Types.ObjectId;
-  readBy: Types.ObjectId;
+  group: Types.ObjectId;
 }
 
 const messageSchema = new Schema<IMessage>(
@@ -16,6 +16,11 @@ const messageSchema = new Schema<IMessage>(
     content: {
       type: String,
       trim: true,
+    },
+    group: {
+      type: Schema.Types.ObjectId,
+      ref: "Group",
+      required: true,
     },
   },
   { timestamps: true }

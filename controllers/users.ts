@@ -6,7 +6,7 @@ import { NewCustomRequest } from './auth.js';
 
 /**
  * @desc Get Users
- * @route Get /api/v1/user/search?
+ * @route Get /api/v1/user?search=
  * @access Public
  */
 

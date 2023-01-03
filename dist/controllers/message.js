@@ -8,15 +8,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import asyncHandler from '../middleware/asyncHandler.js';
+import Group from '../model/Group.js';
 import Message from '../model/Message.js';
 import ErrorResponse from '../utils/errorResponse.js';
 /**
  * @desc Create Message
- * @route POST /api/v1/message
+ * @route POST /api/v1/:groupId/message
  * @access Private
  */
 export const createMessage = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const group = yield Group.findById(req.params.group_id);
+    if (!group) {
+        return next(new ErrorResponse(`Group with id: ${req.params.group_id} was not found.`, 404));
+    }
     const message = yield Message.create({
+        group: req.params.group_id,
         sender: req.user.id,
         content: req.body.content,
     });
@@ -24,11 +30,18 @@ export const createMessage = asyncHandler((req, res, next) => __awaiter(void 0, 
 }));
 /**
  * @desc Get all messages
- * @route GET /api/v1/message
+ * @route GET /api/v1/:groupId/message
  * @access Public
  */
 export const getMessages = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const message = yield Message.find().populate("sender");
+    const group = yield Group.findById(req.params.group_id);
+    if (!group) {
+        return next(new ErrorResponse(`Group with id: ${req.params.group_id} was not found.`, 404));
+    }
+    const message = yield Message.find({ group: req.params.group_id }).populate({
+        path: "group",
+        select: "name _id",
+    });
     res.status(201).json(message);
 }));
 /**
@@ -38,7 +51,6 @@ export const getMessages = asyncHandler((req, res, next) => __awaiter(void 0, vo
  */
 export const deleteMessage = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const message = yield Message.findById(req.params.id);
-    console.log(message);
     if (!message) {
         return next(new ErrorResponse("Message Not Found.", 404));
     }

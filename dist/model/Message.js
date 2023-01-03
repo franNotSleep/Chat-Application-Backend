@@ -8,6 +8,11 @@ const messageSchema = new Schema({
         type: String,
         trim: true,
     },
+    group: {
+        type: Schema.Types.ObjectId,
+        ref: "Group",
+        required: true,
+    },
 }, { timestamps: true });
 const Message = mongoose.model("Message", messageSchema);
 export default Message;
