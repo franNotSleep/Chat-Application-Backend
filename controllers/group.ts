@@ -17,6 +17,7 @@ export const createGroup = asyncHandler(
       admin: req.user.id,
       participants: req.body.participants,
     };
+    console.log(reqBody);
     const group: IGroup = await (
       await Group.create(reqBody)
     ).populate({

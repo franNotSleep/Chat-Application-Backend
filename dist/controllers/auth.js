@@ -105,12 +105,6 @@ export const updatePassword = asyncHandler((req, res, next) => __awaiter(void 0,
         createAndSendToken(user, res, 200);
     }
 }));
-/**
- * Create token
- * Put token into cookie
- * token expires in 30d
- * @param (user, res, statusCode)
- */
 function createAndSendToken(user, res, statusCode) {
     const token = user.getSignJwToken();
     if (typeof process.env.JWT_COOKIE_EXPIRE === "string") {
@@ -118,11 +112,19 @@ function createAndSendToken(user, res, statusCode) {
         let options = {
             expires: new Date(Date.now() + Number(expireDate) * 24 * 60 * 60 * 1000),
             httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            origin: "http://localhost:5173",
         };
         if (process.env.NODE_ENV === "production") {
             options.secure = true;
         }
-        res.status(statusCode).cookie("token", token, options).json({ token });
+        res.status(statusCode).cookie("token", token, options).json({
+            token,
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+        });
     }
 }
 //# sourceMappingURL=auth.js.map

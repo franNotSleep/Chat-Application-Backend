@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { CookieOptions, NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
 
 import asyncHandler from '../middleware/asyncHandler.js';
@@ -159,18 +159,32 @@ export const updatePassword = asyncHandler(
  * token expires in 30d
  * @param (user, res, statusCode)
  */
+interface ICookieOptions extends CookieOptions {
+  expires: Date;
+  httpOnly?: boolean;
+  secure?: boolean;
+  origin: string;
+}
 function createAndSendToken(user: UserType, res: Response, statusCode: number) {
   const token: string = user.getSignJwToken();
 
   if (typeof process.env.JWT_COOKIE_EXPIRE === "string") {
     const expireDate = process.env.JWT_COOKIE_EXPIRE;
-    let options: { expires: Date; httpOnly: boolean; secure?: boolean } = {
+    let options: ICookieOptions = {
       expires: new Date(Date.now() + Number(expireDate) * 24 * 60 * 60 * 1000),
       httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      origin: "http://localhost:5173",
     };
     if (process.env.NODE_ENV === "production") {
       options.secure = true;
     }
-    res.status(statusCode).cookie("token", token, options).json({ token });
+    res.status(statusCode).cookie("token", token, options).json({
+      token,
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    });
   }
 }

@@ -11,6 +11,8 @@ import { Server } from 'socket.io';
 
 import connectDB from './config/db.js';
 import errorHandler from './middleware/errorHandler.js';
+import { IGroup } from './model/Group.js';
+import { IMessage } from './model/Message.js';
 import authRouter from './routes/auth.js';
 import groupRoute from './routes/group.js';
 import messageRoute from './routes/message.js';
@@ -29,7 +31,15 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log(`A user connected`);
+  console.log("Connected: id: ", socket.id);
+  socket.on("join group", (data: IGroup) => {
+    console.log("Id: ", data._id);
+    if (typeof data._id === "string") socket.join(data?._id);
+    socket.on("sendMessage", (msg: IMessage) => {
+      console.log(msg);
+      socket.emit("receivedMessage", msg);
+    });
+  });
 });
 
 // Body parser
@@ -39,7 +49,12 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Enable CORS
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 // Sanitize data
 app.use(ExpressMongoSanitize());

@@ -1,6 +1,7 @@
 import mongoose, { Schema, Types } from 'mongoose';
 
 export interface IGroup {
+  _id?: string | Types.ObjectId;
   name: string;
   admin: Types.ObjectId | string;
   participants: Types.ObjectId;

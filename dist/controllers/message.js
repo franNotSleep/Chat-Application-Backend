@@ -13,20 +13,20 @@ import Message from '../model/Message.js';
 import ErrorResponse from '../utils/errorResponse.js';
 /**
  * @desc Create Message
- * @route POST /api/v1/:groupId/message
+ * @route POST /api/v1/message/:groupId/message
  * @access Private
  */
 export const createMessage = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const group = yield Group.findById(req.params.group_id);
+    const group = yield Group.findById(req.params.groupId);
     if (!group) {
-        return next(new ErrorResponse(`Group with id: ${req.params.group_id} was not found.`, 404));
+        return next(new ErrorResponse(`Group with id: ${req.params.groupId} was not found.`, 404));
     }
     const message = yield Message.create({
-        group: req.params.group_id,
+        group: req.params.groupId,
         sender: req.user.id,
         content: req.body.content,
     });
-    res.status(200).json(message);
+    res.status(201).json(message);
 }));
 /**
  * @desc Get all messages
@@ -34,15 +34,15 @@ export const createMessage = asyncHandler((req, res, next) => __awaiter(void 0, 
  * @access Public
  */
 export const getMessages = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const group = yield Group.findById(req.params.group_id);
+    const group = yield Group.findById(req.params.groupId);
     if (!group) {
-        return next(new ErrorResponse(`Group with id: ${req.params.group_id} was not found.`, 404));
+        return next(new ErrorResponse(`Group with id: ${req.params.groupId} was not found.`, 404));
     }
-    const message = yield Message.find({ group: req.params.group_id }).populate({
+    const message = yield Message.find({ group: req.params.groupId }).populate({
         path: "group",
         select: "name _id",
     });
-    res.status(201).json(message);
+    res.status(200).json(message);
 }));
 /**
  * @desc Delete message

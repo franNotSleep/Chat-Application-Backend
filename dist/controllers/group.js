@@ -21,6 +21,7 @@ export const createGroup = asyncHandler((req, res, next) => __awaiter(void 0, vo
         admin: req.user.id,
         participants: req.body.participants,
     };
+    console.log(reqBody);
     const group = yield (yield Group.create(reqBody)).populate({
         path: "admin participants",
         select: "name",

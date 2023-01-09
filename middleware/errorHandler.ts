@@ -17,6 +17,10 @@ const errorHandler = (
     console.log(err);
   }
 
+  if (err.name === "Error") {
+    error = new ErrorResponse(err.message, 400);
+  }
+
   // Mongoose bad ObjectId
   if (err.name === "CastError") {
     error = new ErrorResponse(`Resource Not Found.`, 404);
@@ -34,10 +38,12 @@ const errorHandler = (
 
   // Mongoose duplicate key
   if (err.code === 11000) {
+    console.log("Duplicate");
     error = new ErrorResponse("Duplicate field", 400);
   }
+
   res
-    .status(error.statusCode ?? 500)
+    .status(error.statusCode || 500)
     .json({ success: false, error: error.message || "Server Error" });
 };
 

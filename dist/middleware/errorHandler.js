@@ -1,11 +1,13 @@
 import ErrorResponse from '../utils/errorResponse.js';
 const errorHandler = (err, req, res, next) => {
-    var _a;
     let error = Object.assign({}, err);
     error.message = err.message;
     // Log in the console for dev
     if (process.env.NODE_ENV === "development") {
         console.log(err);
+    }
+    if (err.name === "Error") {
+        error = new ErrorResponse(err.message, 400);
     }
     // Mongoose bad ObjectId
     if (err.name === "CastError") {
@@ -20,10 +22,11 @@ const errorHandler = (err, req, res, next) => {
     }
     // Mongoose duplicate key
     if (err.code === 11000) {
+        console.log("Duplicate");
         error = new ErrorResponse("Duplicate field", 400);
     }
     res
-        .status((_a = error.statusCode) !== null && _a !== void 0 ? _a : 500)
+        .status(error.statusCode || 500)
         .json({ success: false, error: error.message || "Server Error" });
 };
 export default errorHandler;

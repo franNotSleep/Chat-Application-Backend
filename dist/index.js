@@ -24,14 +24,26 @@ const io = new Server(server, {
     },
 });
 io.on("connection", (socket) => {
-    console.log(`A user connected`);
+    console.log("Connected: id: ", socket.id);
+    socket.on("join group", (data) => {
+        console.log("Id: ", data._id);
+        if (typeof data._id === "string")
+            socket.join(data === null || data === void 0 ? void 0 : data._id);
+        socket.on("sendMessage", (msg) => {
+            console.log(msg);
+            socket.emit("receivedMessage", msg);
+        });
+    });
 });
 // Body parser
 app.use(express.json());
 // Cookie Parser
 app.use(cookieParser());
 // Enable CORS
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+}));
 // Sanitize data
 app.use(ExpressMongoSanitize());
 // Set security header

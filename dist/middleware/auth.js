@@ -14,7 +14,11 @@ import asyncHandler from './asyncHandler.js';
 // Protect routes
 export const protect = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let token = "";
-    if (req.cookies.token) {
+    if (req.headers.authorization &&
+        req.headers.authorization.startsWith("Bearer")) {
+        token = req.headers.authorization.split(" ")[1];
+    }
+    else if (req.cookies.token) {
         token = req.cookies.token;
     }
     // Check token
