@@ -11,8 +11,8 @@ import { Server } from 'socket.io';
 
 import connectDB from './config/db.js';
 import errorHandler from './middleware/errorHandler.js';
-import { IGroup } from './model/Group.js';
 import { IMessage } from './model/Message.js';
+import { User } from './model/User.js';
 import authRouter from './routes/auth.js';
 import groupRoute from './routes/group.js';
 import messageRoute from './routes/message.js';
@@ -25,20 +25,33 @@ const app = express();
 
 const server = http.createServer(app);
 const io = new Server(server, {
+  pingTimeout: 60000,
   cors: {
     origin: "*",
   },
 });
 
 io.on("connection", (socket) => {
-  console.log("Connected: id: ", socket.id);
-  socket.on("join group", (data: IGroup) => {
-    console.log("Id: ", data._id);
-    if (typeof data._id === "string") socket.join(data?._id);
-    socket.on("sendMessage", (msg: IMessage) => {
+  socket.on("setup", (user: User) => {
+    if (typeof user._id === "string") {
+      socket.join(user._id);
+      socket.emit("connected");
+    }
+  });
+
+  socket.on("join-room", (room: string | null) => {
+    if (typeof room === "string") {
+      console.log(colors.bgBlue(`User has joined to ${room}`));
+      socket.join(room);
+    }
+  });
+
+  socket.on("send-message", (msg: IMessage) => {
+    if (typeof msg.group === "string") {
       console.log(msg);
-      socket.emit("receivedMessage", msg);
-    });
+      console.log(colors.bgGreen(`Message emit to ${msg.group}: ${msg}`));
+      socket.to(msg.group).emit("chat", msg);
+    }
   });
 });
 

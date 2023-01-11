@@ -165,7 +165,11 @@ interface ICookieOptions extends CookieOptions {
   secure?: boolean;
   origin: string;
 }
-function createAndSendToken(user: UserType, res: Response, statusCode: number) {
+function createAndSendToken(
+  user: User & Required<{ _id: string | Types.ObjectId }> & UserMethods,
+  res: Response,
+  statusCode: number
+) {
   const token: string = user.getSignJwToken();
 
   if (typeof process.env.JWT_COOKIE_EXPIRE === "string") {

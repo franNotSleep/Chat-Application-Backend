@@ -8,6 +8,7 @@ const groupSchema = new Schema({
     participants: [
         {
             type: Schema.Types.ObjectId,
+            unique: true,
             ref: "User",
         },
     ],

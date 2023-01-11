@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import { readFileSync } from 'fs';
 import mongoose from 'mongoose';
 
+import Group from './model/Group.js';
+import Message from './model/Message.js';
 import { userModel } from './model/User.js';
 
 // Load env vars
@@ -41,6 +43,8 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await userModel.deleteMany();
+    await Message.deleteMany();
+    await Group.deleteMany();
     console.log(colors.white.bgRed("Data deleted..."));
     process.exit();
   } catch (error) {

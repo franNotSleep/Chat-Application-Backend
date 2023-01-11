@@ -21,12 +21,15 @@ export const createMessage = asyncHandler((req, res, next) => __awaiter(void 0, 
     if (!group) {
         return next(new ErrorResponse(`Group with id: ${req.params.groupId} was not found.`, 404));
     }
-    const message = yield Message.create({
+    const newMessage = yield Message.create({
         group: req.params.groupId,
         sender: req.user.id,
         content: req.body.content,
     });
-    res.status(201).json(message);
+    // const message = newMessage.populate({
+    //   path: "group sender",
+    // });
+    res.status(201).json(newMessage);
 }));
 /**
  * @desc Get all messages

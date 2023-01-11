@@ -22,13 +22,17 @@ export const createMessage = asyncHandler(
         )
       );
     }
-    const message = await Message.create({
+    const newMessage = await Message.create({
       group: req.params.groupId,
       sender: req.user.id,
       content: req.body.content,
     });
 
-    res.status(201).json(message);
+    // const message = newMessage.populate({
+    //   path: "group sender",
+    // });
+
+    res.status(201).json(newMessage);
   }
 );
 

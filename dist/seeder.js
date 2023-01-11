@@ -11,6 +11,8 @@ import colors from 'colors';
 import dotenv from 'dotenv';
 import { readFileSync } from 'fs';
 import mongoose from 'mongoose';
+import Group from './model/Group.js';
+import Message from './model/Message.js';
 import { userModel } from './model/User.js';
 // Load env vars
 // dotenv.config({ path: "./config/.env" });
@@ -44,6 +46,8 @@ const importData = () => __awaiter(void 0, void 0, void 0, function* () {
 const deleteData = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield userModel.deleteMany();
+        yield Message.deleteMany();
+        yield Group.deleteMany();
         console.log(colors.white.bgRed("Data deleted..."));
         process.exit();
     }

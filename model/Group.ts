@@ -18,6 +18,7 @@ const groupSchema = new Schema<IGroup>(
     participants: [
       {
         type: Schema.Types.ObjectId,
+        unique: true,
         ref: "User",
       },
     ],

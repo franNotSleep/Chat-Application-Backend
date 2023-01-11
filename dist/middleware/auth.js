@@ -21,6 +21,7 @@ export const protect = asyncHandler((req, res, next) => __awaiter(void 0, void 0
     else if (req.cookies.token) {
         token = req.cookies.token;
     }
+    console.log(`token: ${token}`);
     // Check token
     if (!token) {
         return next(new ErrorResponse("Not Authorized", 401));

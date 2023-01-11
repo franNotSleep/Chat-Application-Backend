@@ -4,7 +4,7 @@ export interface IMessage {
   _id: Types.ObjectId;
   sender: Types.ObjectId;
   content: string;
-  group: Types.ObjectId;
+  group: Types.ObjectId | string;
 }
 
 const messageSchema = new Schema<IMessage>(

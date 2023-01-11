@@ -1,8 +1,9 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 export interface User {
+  _id?: Types.ObjectId | string;
   name: string;
   email: string;
   aboutMe?: string;

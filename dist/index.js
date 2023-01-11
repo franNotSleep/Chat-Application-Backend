@@ -19,20 +19,30 @@ dotenv.config({ path: "./config/.env" });
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
+    pingTimeout: 60000,
     cors: {
         origin: "*",
     },
 });
 io.on("connection", (socket) => {
-    console.log("Connected: id: ", socket.id);
-    socket.on("join group", (data) => {
-        console.log("Id: ", data._id);
-        if (typeof data._id === "string")
-            socket.join(data === null || data === void 0 ? void 0 : data._id);
-        socket.on("sendMessage", (msg) => {
+    socket.on("setup", (user) => {
+        if (typeof user._id === "string") {
+            socket.join(user._id);
+            socket.emit("connected");
+        }
+    });
+    socket.on("join-room", (room) => {
+        if (typeof room === "string") {
+            console.log(colors.bgBlue(`User has joined to ${room}`));
+            socket.join(room);
+        }
+    });
+    socket.on("send-message", (msg) => {
+        if (typeof msg.group === "string") {
             console.log(msg);
-            socket.emit("receivedMessage", msg);
-        });
+            console.log(colors.bgGreen(`Message emit to ${msg.group}: ${msg}`));
+            socket.to(msg.group).emit("chat", msg);
+        }
     });
 });
 // Body parser

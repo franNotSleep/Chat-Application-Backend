@@ -89,4 +89,53 @@ export const renameGroup = asyncHandler((req, res, next) => __awaiter(void 0, vo
     });
     res.status(200).json({ success: true, group });
 }));
+/**
+ * @desc Leave group
+ * @route GET /api/v1/group/:id
+ * @access Private
+ */
+export const leaveGroup = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let group = yield Group.findById(req.params.id);
+    if (!group) {
+        return next(new ErrorResponse("Group Not Found.", 404));
+    }
+    group = yield Group.findByIdAndUpdate(req.params.id, {
+        $pull: { participants: req.body.userId },
+    }, {
+        runValidators: true,
+        new: true,
+    }).populate({
+        path: "participants admin",
+        select: "name",
+    });
+    res.status(200).json({ success: true });
+}));
+/**
+ * @desc Join group
+ * @route PUT /api/v1/group/:id/add
+ * @access Private
+ */
+export const joinGroup = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let group = yield Group.findById(req.params.id).populate({
+        path: "participants admin",
+        select: "_id",
+    });
+    if (!group) {
+        return next(new ErrorResponse("Group Not Found.", 404));
+    }
+    // If current user is admin
+    if (group.admin === req.body.userId) {
+        return next(new ErrorResponse("You are admin", 400));
+    }
+    group = yield Group.findByIdAndUpdate(req.params.id, {
+        $push: { participants: req.body.userId },
+    }, {
+        runValidators: true,
+        new: true,
+    }).populate({
+        path: "participants admin",
+        select: "name",
+    });
+    res.status(200).json(group);
+}));
 //# sourceMappingURL=group.js.map
