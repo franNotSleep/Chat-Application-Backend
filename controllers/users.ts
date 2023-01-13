@@ -23,7 +23,8 @@ export const getUsers = asyncHandler(
 
     const users = await userModel
       .find(query)
-      .find({ _id: { $ne: req.user.id } });
+      .find({ _id: { $ne: req.user._id } });
+
     res.status(200).json({ users });
   }
 );

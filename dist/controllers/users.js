@@ -25,7 +25,7 @@ export const getUsers = asyncHandler((req, res, next) => __awaiter(void 0, void 
         : {};
     const users = yield userModel
         .find(query)
-        .find({ _id: { $ne: req.user.id } });
+        .find({ _id: { $ne: req.user._id } });
     res.status(200).json({ users });
 }));
 //# sourceMappingURL=users.js.map
