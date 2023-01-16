@@ -8,6 +8,7 @@ export interface User {
   email: string;
   aboutMe?: string;
   password: string;
+  avatar: string;
 }
 
 export interface UserMethods {
@@ -38,10 +39,23 @@ const userSchema = new mongoose.Schema<User, UserModel, UserMethods>({
     minlength: 6,
     select: false,
   },
+  avatar: {
+    type: String,
+    required: true,
+    default: `https://api.dicebear.com/5.x/pixel-art/svg?seed=default`,
+  },
   aboutMe: {
     type: String,
     maxLength: [500, `Description can't be more than 500 characters`],
   },
+});
+
+// asign an avatar to the user
+userSchema.pre("save", function (next) {
+  // Example:  Greg Harris -> ["Greg", "Harris"] -> Greg
+  let userName = this.name.split(" ")[0];
+  this.avatar = `https://api.dicebear.com/5.x/pixel-art/svg?seed=${userName}`;
+  next();
 });
 
 // Encrypt Password

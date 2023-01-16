@@ -11,6 +11,7 @@ interface UserRegistration {
   email: string;
   password: string;
   aboutMe?: string;
+  avatar: string;
 }
 
 type UserType = User & {
@@ -189,6 +190,7 @@ function createAndSendToken(
       _id: user._id,
       name: user.name,
       email: user.email,
+      avatar: user.avatar,
     });
   }
 }
