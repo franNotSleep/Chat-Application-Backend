@@ -8,11 +8,9 @@ const groupSchema = new Schema({
     participants: [
         {
             type: Schema.Types.ObjectId,
-            unique: true,
             ref: "User",
         },
     ],
-    private: { type: Boolean, default: true },
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

@@ -91,7 +91,7 @@ export const renameGroup = asyncHandler((req, res, next) => __awaiter(void 0, vo
 }));
 /**
  * @desc Leave group
- * @route GET /api/v1/group/:id
+ * @route PUT /api/v1/group/:id
  * @access Private
  */
 export const leaveGroup = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
