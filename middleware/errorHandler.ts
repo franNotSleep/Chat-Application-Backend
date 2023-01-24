@@ -16,11 +16,6 @@ const errorHandler = (
   if (process.env.NODE_ENV === "development") {
     console.log(err);
   }
-
-  if (err.name === "Error") {
-    error = new ErrorResponse(err.message, 400);
-  }
-
   // Mongoose bad ObjectId
   if (err.name === "CastError") {
     error = new ErrorResponse(`Resource Not Found.`, 404);

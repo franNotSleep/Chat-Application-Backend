@@ -11,8 +11,6 @@ import { Server } from 'socket.io';
 
 import connectDB from './config/db.js';
 import errorHandler from './middleware/errorHandler.js';
-import { IMessage } from './model/Message.js';
-import { User } from './model/User.js';
 import authRouter from './routes/auth.js';
 import groupRoute from './routes/group.js';
 import messageRoute from './routes/message.js';
@@ -32,26 +30,13 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  socket.on("setup", (user: User) => {
-    if (typeof user._id === "string") {
-      socket.join(user._id);
-      socket.emit("connected");
-    }
+  socket.on("join group", (group: string) => {
+    console.log(`Group: ${group}`);
+    socket.join(group);
   });
-
-  socket.on("join-room", (room: string | null) => {
-    if (typeof room === "string") {
-      console.log(colors.bgBlue(`User has joined to ${room}`));
-      socket.join(room);
-    }
-  });
-
-  socket.on("send-message", (msg: IMessage) => {
-    if (typeof msg.group === "string") {
-      console.log(msg);
-      console.log(colors.bgGreen(`Message emit to ${msg.group}: ${msg}`));
-      socket.to(msg.group).emit("chat", msg);
-    }
+  socket.on("new message", ({ content, to }) => {
+    console.log(content);
+    socket.to(to).emit("message received", content);
   });
 });
 

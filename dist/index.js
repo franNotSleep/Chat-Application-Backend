@@ -25,24 +25,13 @@ const io = new Server(server, {
     },
 });
 io.on("connection", (socket) => {
-    socket.on("setup", (user) => {
-        if (typeof user._id === "string") {
-            socket.join(user._id);
-            socket.emit("connected");
-        }
+    socket.on("join group", (group) => {
+        console.log(`Group: ${group}`);
+        socket.join(group);
     });
-    socket.on("join-room", (room) => {
-        if (typeof room === "string") {
-            console.log(colors.bgBlue(`User has joined to ${room}`));
-            socket.join(room);
-        }
-    });
-    socket.on("send-message", (msg) => {
-        if (typeof msg.group === "string") {
-            console.log(msg);
-            console.log(colors.bgGreen(`Message emit to ${msg.group}: ${msg}`));
-            socket.to(msg.group).emit("chat", msg);
-        }
+    socket.on("new message", ({ content, to }) => {
+        console.log(content);
+        socket.to(to).emit("message received", content);
     });
 });
 // Body parser

@@ -26,10 +26,14 @@ export const createMessage = asyncHandler((req, res, next) => __awaiter(void 0, 
         sender: req.user.id,
         content: req.body.content,
     });
+    const newMessagePopulate = yield newMessage.populate({
+        path: "group sender",
+        select: "name _id avatar",
+    });
     // const message = newMessage.populate({
     //   path: "group sender",
     // });
-    res.status(201).json(newMessage);
+    res.status(201).json(newMessagePopulate);
 }));
 /**
  * @desc Get all messages
@@ -42,8 +46,8 @@ export const getMessages = asyncHandler((req, res, next) => __awaiter(void 0, vo
         return next(new ErrorResponse(`Group with id: ${req.params.groupId} was not found.`, 404));
     }
     const message = yield Message.find({ group: req.params.groupId }).populate({
-        path: "group",
-        select: "name _id",
+        path: "group sender",
+        select: "name _id avatar",
     });
     res.status(200).json(message);
 }));

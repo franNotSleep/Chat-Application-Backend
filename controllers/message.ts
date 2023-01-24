@@ -28,11 +28,16 @@ export const createMessage = asyncHandler(
       content: req.body.content,
     });
 
+    const newMessagePopulate = await newMessage.populate({
+      path: "group sender",
+      select: "name _id avatar",
+    });
+
     // const message = newMessage.populate({
     //   path: "group sender",
     // });
 
-    res.status(201).json(newMessage);
+    res.status(201).json(newMessagePopulate);
   }
 );
 
@@ -53,8 +58,8 @@ export const getMessages = asyncHandler(
       );
     }
     const message = await Message.find({ group: req.params.groupId }).populate({
-      path: "group",
-      select: "name _id",
+      path: "group sender",
+      select: "name _id avatar",
     });
     res.status(200).json(message);
   }
