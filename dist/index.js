@@ -33,6 +33,9 @@ io.on("connection", (socket) => {
         console.log(content);
         socket.to(to).emit("message received", content);
     });
+    socket.on("disconnect", (reason) => {
+        console.log(`User disconnected`);
+    });
 });
 // Body parser
 app.use(express.json());

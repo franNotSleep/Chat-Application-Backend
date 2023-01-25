@@ -31,11 +31,9 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   socket.on("join group", (group: string) => {
-    console.log(`Group: ${group}`);
     socket.join(group);
   });
   socket.on("new message", ({ content, to }) => {
-    console.log(content);
     socket.to(to).emit("message received", content);
   });
 });
