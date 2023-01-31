@@ -12,12 +12,7 @@ import { NewCustomRequest } from './auth.js';
  */
 export const createGroup = asyncHandler(
   async (req: NewCustomRequest, res: Response, next: NextFunction) => {
-    const reqBody: IGroup = {
-      name: req.body.name,
-      admin: req.user.id,
-      participants: req.body.participants,
-    };
-    console.log(reqBody);
+    const reqBody: IGroup = req.body;
     const group: IGroup = await (
       await Group.create(reqBody)
     ).populate({

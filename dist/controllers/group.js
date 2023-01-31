@@ -16,12 +16,7 @@ import ErrorResponse from '../utils/errorResponse.js';
  * @access Private
  */
 export const createGroup = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const reqBody = {
-        name: req.body.name,
-        admin: req.user.id,
-        participants: req.body.participants,
-    };
-    console.log(reqBody);
+    const reqBody = req.body;
     const group = yield (yield Group.create(reqBody)).populate({
         path: "admin participants",
         select: "name",
