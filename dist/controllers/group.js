@@ -7,16 +7,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import asyncHandler from '../middleware/asyncHandler.js';
-import Group from '../model/Group.js';
-import ErrorResponse from '../utils/errorResponse.js';
+import asyncHandler from "../middleware/asyncHandler.js";
+import Group from "../model/Group.js";
+import ErrorResponse from "../utils/errorResponse.js";
 /**
  * @desc Create Group
  * @route POST /api/v1/group/
  * @access Private
  */
 export const createGroup = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const reqBody = req.body;
+    const reqBody = Object.assign(Object.assign({}, req.body), { admin: req.user.id });
     const group = yield (yield Group.create(reqBody)).populate({
         path: "admin participants",
         select: "name",
@@ -37,7 +37,7 @@ export const getGroups = asyncHandler((req, res, next) => __awaiter(void 0, void
     const group = yield Group.find(query)
         .populate({
         path: "admin participants",
-        select: "name",
+        select: "name avatar",
     })
         .sort("-createdAt");
     res.status(200).json({ group });
@@ -60,7 +60,7 @@ export const getUserGroups = asyncHandler((req, res, next) => __awaiter(void 0, 
         .find(query)
         .populate({
         path: "participants admin",
-        select: "name",
+        select: "name avatar",
     })
         .sort("-createdAt");
     res.status(200).json({ group });
@@ -86,7 +86,7 @@ export const renameGroup = asyncHandler((req, res, next) => __awaiter(void 0, vo
 }));
 /**
  * @desc Leave group
- * @route PUT /api/v1/group/:id
+ * @route PUT /api/v1/group/:id/leave
  * @access Private
  */
 export const leaveGroup = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

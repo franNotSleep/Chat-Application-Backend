@@ -1,9 +1,9 @@
-import { NextFunction, Response } from 'express';
+import { NextFunction, Response } from "express";
 
-import asyncHandler from '../middleware/asyncHandler.js';
-import Group, { IGroup } from '../model/Group.js';
-import ErrorResponse from '../utils/errorResponse.js';
-import { NewCustomRequest } from './auth.js';
+import asyncHandler from "../middleware/asyncHandler.js";
+import Group, { IGroup } from "../model/Group.js";
+import ErrorResponse from "../utils/errorResponse.js";
+import { NewCustomRequest } from "./auth.js";
 
 /**
  * @desc Create Group
@@ -12,7 +12,7 @@ import { NewCustomRequest } from './auth.js';
  */
 export const createGroup = asyncHandler(
   async (req: NewCustomRequest, res: Response, next: NextFunction) => {
-    const reqBody: IGroup = req.body;
+    const reqBody: IGroup = { ...req.body, admin: req.user.id };
     const group: IGroup = await (
       await Group.create(reqBody)
     ).populate({
@@ -40,7 +40,7 @@ export const getGroups = asyncHandler(
     const group = await Group.find(query)
       .populate({
         path: "admin participants",
-        select: "name",
+        select: "name avatar",
       })
       .sort("-createdAt");
     res.status(200).json({ group });
@@ -67,7 +67,7 @@ export const getUserGroups = asyncHandler(
       .find(query)
       .populate({
         path: "participants admin",
-        select: "name",
+        select: "name avatar",
       })
       .sort("-createdAt");
     res.status(200).json({ group });
@@ -102,7 +102,7 @@ export const renameGroup = asyncHandler(
 
 /**
  * @desc Leave group
- * @route PUT /api/v1/group/:id
+ * @route PUT /api/v1/group/:id/leave
  * @access Private
  */
 export const leaveGroup = asyncHandler(

@@ -37,7 +37,7 @@ const groupSchema = new Schema<IGroup>(
 
 // asign an pic to the user
 groupSchema.pre("save", function (next) {
-  this.pic = `https://api.dicebear.com/5.x/identicon/svg?seed=${name}`;
+  this.pic = `https://api.dicebear.com/5.x/identicon/svg?seed=${this.name}`;
   next();
 });
 
